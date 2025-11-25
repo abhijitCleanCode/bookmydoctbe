@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    /* Language & Environment */
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+
+    /* Output & Build */
+    "outDir": "dist",
+    "rootDir": "src",
+    "sourceMap": true,
+    "declaration": false,
+    "removeComments": true,
+    "noEmitOnError": true,
+
+    /* Strict Type Checking */
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
+
+    /* Node.js Support */
+    "types": ["node"],
+    "allowJs": false,
+
+    /* Modern Features */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Path Aliases */
+    "baseUrl": "src",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@config/*": ["config/*"],
+      "@core/*": ["core/*"],
+      "@modules/*": ["modules/*"],
+      "@utils/*": ["utils/*"],
+      "@database/*": ["database/*"],
+      "@infra/*": ["infra/*"],
+      "@queue/*": ["queue/*"],
+    }
+  },
+
+  "include": ["src", "src/loadEnv.ts"],
+  "exclude": ["node_modules", "dist"]
+}
