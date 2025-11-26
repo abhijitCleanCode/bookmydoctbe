@@ -1,8 +1,6 @@
 function getEnv(name: string, required = true): string {
     const value = process.env[name];
 
-    console.log(name, "value :: ", value);
-
     // handle value not found
     if (!value && required) {
         throw new Error(`❌ Environment variable "${name}" is required but not set.`);

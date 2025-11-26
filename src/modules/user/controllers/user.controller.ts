@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import userService from "../services/user.service";
 import { ApiResponse } from "@core/ApiResponse";
+import { AuthenticatedRequest } from "types";
 
 class UserController {
   private userService = userService;
@@ -49,11 +50,32 @@ class UserController {
         .status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
-        .json(new ApiResponse(200, user, "User logged in!"));
+        .json(new ApiResponse(200, user, "Login Success!"));
     } catch (error) {
       next(error);
     }
   };
+
+  LOGOUT = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    const userId = req.user?._id;
+
+    try {
+      await this.userService.logout(userId);
+
+      const options = {
+        httpOnly: true,
+        secure: true,
+      }
+
+      return res
+        .status(200)
+        .clearCookie("accessToken", options)
+        .clearCookie("refreshToken", options)
+        .json(new ApiResponse(200, "Logout Success!"));
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new UserController();

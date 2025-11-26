@@ -22,6 +22,7 @@ export interface IUser {
     pincode?: number;
     state?: string;
 
+    // session embedding
     session?: {
         refreshToken: string;
         createdAt: Date;

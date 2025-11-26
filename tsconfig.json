@@ -43,8 +43,8 @@
       "@utils/*": ["utils/*"],
       "@database/*": ["database/*"],
       "@infra/*": ["infra/*"],
-      "@queue/*": ["queue/*"],
-    }
+      "@queue/*": ["queue/*"]
+    },
   },
 
   "include": ["src", "src/loadEnv.ts"],

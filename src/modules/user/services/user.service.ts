@@ -43,12 +43,16 @@ class UserService {
     });
 
     // add job to queue
-    await otpQueue.add("sendOtp", {
-      otpId,
-      plaintextOtp: otp,
-      destination: newUser.email,
-      channel: "email"
-    }, { priority: 2 })
+    await otpQueue.add(
+      "sendOtp",
+      {
+        otpId,
+        plaintextOtp: otp,
+        destination: newUser.email,
+        channel: "email",
+      },
+      { priority: 2 }
+    );
 
     return { newUser, otpId };
   }
@@ -59,43 +63,84 @@ class UserService {
       throw new ApiError("Invalid OTP", 400);
     }
 
-    const user = await User.updateOne({ _id: userId }, { $set: { isEmailVerified: true } })
+    const user = await User.updateOne(
+      { _id: userId },
+      { $set: { isEmailVerified: true } }
+    );
 
-    return user
+    return user;
   }
 
   async login(email: string, password: string) {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new ApiError("Invalid credentials", 404)
+      throw new ApiError("Invalid credentials", 404);
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
-      throw new ApiError("Invalid credentials", 404)
+      throw new ApiError("Invalid credentials", 404);
     }
 
     // generate jwt tokens (access & refresh)
-    const { accessToken, refreshToken } = this.generateAccessAndRefreshTokens(user, user._id.toString());
+    const { accessToken, refreshToken } = this.generateAccessAndRefreshTokens(
+      user,
+      user._id.toString()
+    );
+
+    const now = new Date();
+
+    const sessionCreatedAt = user.session?.createdAt ? user.session.createdAt : now;
+
+    // update last seen
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          "session.lastSeen": now,
+          "session.refreshToken": refreshToken,
+          "session.createdAt": sessionCreatedAt
+        }
+      }
+    );
 
     return { user, accessToken, refreshToken };
   }
 
+  async logout(userId = "") {
+    const result = await User.updateOne(
+      { _id: userId },
+      { $unset: { "session.refreshToken": 1 } } // setting 1 is ideal bson practice
+    )
+
+    if (result.modifiedCount === 0) {
+      throw new ApiError("User not found", 404);
+    }
+
+    return true
+  }
+
   private generateAccessAndRefreshTokens(user: IUser, userId: string) {
     try {
-      const accessToken = generateAccessToken({
-        id: userId,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        role: user.role
-      }, "1d");
+      const accessToken = generateAccessToken(
+        {
+          _id: userId,
+          email: user.email,
+          isEmailVerified: user.isEmailVerified,
+          role: user.role,
+        },
+        "1d"
+      );
 
-      const refreshToken = generateRefreshToken({
-        id: userId,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        role: user.role
-      }, "7d");
+      const refreshToken = generateRefreshToken(
+        {
+          _id: userId,
+          email: user.email,
+          isEmailVerified: user.isEmailVerified,
+          role: user.role,
+        },
+        "7d"
+      );
 
       return { accessToken, refreshToken };
     } catch (error) {

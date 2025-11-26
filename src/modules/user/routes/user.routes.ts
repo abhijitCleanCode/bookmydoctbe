@@ -2,6 +2,7 @@ import type { RouteDefinition } from "@app/routes/route.type";
 import userController from "../controllers/user.controller";
 import { validate } from "@app/middlewares/validate.middleware";
 import { LoginSchema, SignupUserSchema, VerifyEmailSchema } from "../validator/user.validator";
+import { verifyJWT } from "@app/middlewares/auth.middleware";
 
 export const userRoutes: RouteDefinition[] = [
     {
@@ -33,5 +34,15 @@ export const userRoutes: RouteDefinition[] = [
             post: validate(LoginSchema),
         },
         version: "v1",
+    },
+    {
+        path: "/logout",
+        controller: {
+            post: userController.LOGOUT
+        },
+        middlewares: {
+            post: verifyJWT
+        },
+        version: "v1"
     }
 ]
