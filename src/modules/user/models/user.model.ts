@@ -21,7 +21,25 @@ export interface IUser {
     city?: string;
     pincode?: number;
     state?: string;
+
+    session?: {
+        refreshToken: string;
+        createdAt: Date;
+        lastSeen: Date;
+    }
 }
+
+const SessionSchema = new Schema({
+    refreshToken: {
+        type: String,
+        required: true,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+    lastSeen: Date,
+})
 
 const UserSchema = new Schema<IUser>({
     name: {
@@ -47,6 +65,7 @@ const UserSchema = new Schema<IUser>({
     },
     role: {
         type: String,
+        enum: ["admin", "clinic", "user"],
         default: "user",
     },
 
@@ -68,12 +87,14 @@ const UserSchema = new Schema<IUser>({
     state: {
         type: String,
     },
+
+    session: SessionSchema,
 }, { timestamps: true })
 
 // required for $near queries
 UserSchema.index({ location: "2dsphere" });
 
-UserSchema.pre("save", async function(next) {
+UserSchema.pre("save", async function (next) {
     if (!this.isModified("password")) {
         return next();
     }

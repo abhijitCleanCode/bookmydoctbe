@@ -3,6 +3,9 @@ import { IUser, User } from "../models/user.model";
 import { OtpService } from "./otp.service";
 import { otpQueue } from "queue/otp/otp.queue";
 
+import bcrypt from "bcrypt";
+import { generateAccessToken, generateRefreshToken } from "@utils/jwt.utils";
+
 class UserService {
   async signUp(payload: IUser) {
     const { email, location } = payload;
@@ -59,6 +62,45 @@ class UserService {
     const user = await User.updateOne({ _id: userId }, { $set: { isEmailVerified: true } })
 
     return user
+  }
+
+  async login(email: string, password: string) {
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new ApiError("Invalid credentials", 404)
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      throw new ApiError("Invalid credentials", 404)
+    }
+
+    // generate jwt tokens (access & refresh)
+    const { accessToken, refreshToken } = this.generateAccessAndRefreshTokens(user, user._id.toString());
+
+    return { user, accessToken, refreshToken };
+  }
+
+  private generateAccessAndRefreshTokens(user: IUser, userId: string) {
+    try {
+      const accessToken = generateAccessToken({
+        id: userId,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        role: user.role
+      }, "1d");
+
+      const refreshToken = generateRefreshToken({
+        id: userId,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        role: user.role
+      }, "7d");
+
+      return { accessToken, refreshToken };
+    } catch (error) {
+      throw new ApiError("Failed to generate access and refresh tokens", 500);
+    }
   }
 }
 

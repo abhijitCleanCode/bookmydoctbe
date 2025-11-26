@@ -33,3 +33,17 @@ export const VerifyEmailSchema: JSONSchemaType<VerifyEmail> = {
     required: ["otpId", "otp", "userId"],
     additionalProperties: false,
 }
+
+export interface Login {
+    email: string;
+    password: string;
+}
+export const LoginSchema: JSONSchemaType<Login> = {
+    type: "object",
+    properties: {
+        email: { type: "string" },
+        password: { type: "string" },
+    },
+    required: ["email", "password"],
+    additionalProperties: false,
+}

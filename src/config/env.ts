@@ -17,8 +17,11 @@ export const env = {
 
     CORS_ORIGIN: getEnv("CORS_ORIGINS", false) || "*",
 
-    JWT_SECRET: getEnv("JWT_SECRET",),
-    JWT_EXPIRES_IN: getEnv("JWT_EXPIRES_IN") || "7d",
+    ACCESS_TOKEN_SECRET: getEnv("ACCESS_TOKEN_SECRET",),
+    ACCESS_TOKEN_EXPIRY: getEnv("ACCESS_TOKEN_EXPIRY", false) || "1d",
+
+    REFRESH_TOKEN_SECRET: getEnv("REFRESH_TOKEN_SECRET"),
+    REFRESH_TOKEN_EXPIRY: getEnv("REFRESH_TOKEN_EXPIRY", false) || "7d",
 
     DATABASE_URI: getEnv("DATABASE_URI"),
     DATABASE_NAME: getEnv("DATABASE_NAME"),
