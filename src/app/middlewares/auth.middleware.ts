@@ -22,6 +22,7 @@ export const verifyJWT = async (req: AuthenticatedRequest, res: Response, next: 
             role: string
         }>(token);
 
+        // querying should be done according to role in decodedToken
         const userInfo = await User.findById(decodedToken?._id).select("-password -session.refreshToken")
 
         if (!userInfo) {

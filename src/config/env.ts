@@ -13,7 +13,7 @@ export const env = {
     NODE_ENV: getEnv("NODE_ENV", false) || "",
     PORT: parseInt(getEnv("PORT", false)) || 3000,
 
-    CORS_ORIGIN: getEnv("CORS_ORIGINS", false) || "*",
+    CORS_ORIGIN: getEnv("CORS_ORIGIN"),
 
     ACCESS_TOKEN_SECRET: getEnv("ACCESS_TOKEN_SECRET",),
     ACCESS_TOKEN_EXPIRY: getEnv("ACCESS_TOKEN_EXPIRY", false) || "1d",

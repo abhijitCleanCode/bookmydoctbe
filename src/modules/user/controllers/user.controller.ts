@@ -42,9 +42,11 @@ class UserController {
       );
 
       const options = {
-        httpOnly: true,
-        secure: true,
-      };
+        httpOnly: true, // Cookie will not be exposed to client side code
+        sameSite: "none" as "none", // If client and server origins are different
+        secure: true, // use with HTTPS only
+        maxAge: 24 * 60 * 60 * 1000
+      }
 
       return res
         .status(200)
