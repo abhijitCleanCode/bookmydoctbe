@@ -5,6 +5,7 @@ import { otpQueue } from "queue/otp/otp.queue";
 
 import bcrypt from "bcrypt";
 import { generateAccessToken, generateRefreshToken } from "@utils/jwt.utils";
+import { Role, RolePermissions } from "@config/roles.config";
 
 class UserService {
   async signUp(payload: IUser) {
@@ -104,7 +105,17 @@ class UserService {
       }
     );
 
-    return { user, accessToken, refreshToken };
+    // type assertion as role are fixed
+    const role = user.role as Role;
+
+    // defensive checklist, avoid accidental runtime breaks
+    if (!role || !RolePermissions[role]) {
+      throw new ApiError(`Invalid role: ${role}`, 400);
+    }
+
+    const permissions = [...RolePermissions[role]]
+
+    return { user, accessToken, refreshToken, permissions };
   }
 
   async logout(userId = "") {

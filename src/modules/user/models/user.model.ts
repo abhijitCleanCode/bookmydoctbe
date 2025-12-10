@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import { Role } from "@config/roles.config";
 
 const { Schema } = mongoose;
 
@@ -10,7 +11,7 @@ export interface IUser {
     phoneNumber: string;
     isEmailVerified?: boolean;
 
-    role?: string;
+    role?: Role;
     createdAt: Date;
     updatedAt: Date;
 
